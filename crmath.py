@@ -57,15 +57,11 @@ class Chest:
             "Arena", "Cards", "Min Gold", "Max Gold"
         ))
         for arena_id in range(1, 13):
-            cards = self.prop_by_arena('random_spells', arena_id)
-            min_gold = self.min_gold_per_card * cards
-            max_gold = self.max_gold_per_card * cards
-
             out.append(("{:>10,.2f}" * 4).format(
                 arena_id,
-                cards,
-                min_gold,
-                max_gold
+                self.card_count_by_arena(arena_id),
+                self.min_gold_by_arena(arena_id),
+                self.max_gold_by_arena(arena_id)
             ))
 
         out.append("-" * 80)
@@ -76,6 +72,16 @@ class Chest:
         if row is not None:
             return int(row['ChestRewardMultiplier']) / 100 * getattr(self, prop)
         return 0
+
+    def card_count_by_arena(self, arena_id):
+        return self.prop_by_arena('random_spells', arena_id)
+
+    def min_gold_by_arena(self, arena_id):
+        return self.min_gold_per_card * self.card_count_by_arena(arena_id)
+
+    def max_gold_by_arena(self, arena_id):
+        return self.max_gold_per_card * self.card_count_by_arena(arena_id)
+
 
 
 out = []
