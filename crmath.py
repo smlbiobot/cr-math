@@ -38,11 +38,13 @@ def arena_row_by_id(arena_id):
 
 def get_prop(data, attr):
     value = data.get(attr)
+    if not value:
+        return 0
     if value.isdigit():
         value = int(value)
     return value
 
-
+gem_per_hour = 6
 
 
 class Chest:
@@ -64,25 +66,28 @@ class Chest:
                  'random_spells']
         for attr in attrs:
             out.append("{:<30}{:>10}".format(attr, getattr(self, attr)))
-        out.append(("{:>14}" * 11).format(
-            "Arena", "Cards", "Min Gold", "Max Gold", "Avg Gold", "Commons", "Rares", "Epics", "Leggies", "Card Worth", "Value"
-        ))
+
+        columns = [
+            "Arena", "Cards", "Min Gold", "Max Gold", "Avg Gold",
+            "Commons", "Rares", "Epics", "Leggies", "Card Worth", "Value",
+            "Cycle Value", "Cycle hrs", "Cycle Gems"]
+        out.append(("{:>14}" * len(columns)).format(*columns))
         for arena_id in range(1, 13):
-            avg_gold = (self.min_gold_by_arena(arena_id) + self.max_gold_by_arena(arena_id)) / 2
-            card_worth = self.card_worth(arena_id)
-            chest_value = avg_gold + card_worth
-            out.append(("{:>14,.5f}" * 11).format(
+            out.append(("{:>14,.4f}" * len(columns)).format(
                 arena_id,
                 self.card_count_by_arena(arena_id),
                 self.min_gold_by_arena(arena_id),
                 self.max_gold_by_arena(arena_id),
-                avg_gold,
+                self.avg_gold_by_arena(arena_id),
                 self.common_count_by_arena(arena_id),
                 self.rare_count_by_arena(arena_id),
                 self.epic_count_by_arena(arena_id),
                 self.legendary_count_by_arena(arena_id),
-                card_worth,
-                chest_value
+                self.card_worth(arena_id),
+                self.chest_value(arena_id),
+                self.value_in_cycle(arena_id),
+                self.time_in_cycle,
+                self.gem_in_cycle
             ))
 
         out.append("-" * 80)
@@ -146,6 +151,23 @@ class Chest:
     def max_gold_by_arena(self, arena_id):
         return self.max_gold_per_card * self.card_count_by_arena(arena_id)
 
+    def avg_gold_by_arena(self, arena_id):
+        return (self.min_gold_by_arena(arena_id) + self.max_gold_by_arena(arena_id)) / 2
+
+    def chest_value(self, arena_id):
+        return self.card_worth(arena_id) + self.avg_gold_by_arena(arena_id)
+
+    def value_in_cycle(self, arena_id):
+        return self.chest_value(arena_id) * self.count_per_cycle
+
+    @property
+    def time_in_cycle(self):
+        return self.count_per_cycle * self.time_taken_hours
+
+    @property
+    def gem_in_cycle(self):
+        return self.time_in_cycle * gem_per_hour * 1.0
+
     @property
     def count_per_cycle(self):
         # regular chest
@@ -153,7 +175,9 @@ class Chest:
             if k == self.name:
                 return count
         # special chest
-        return 1/500 * 240
+        if self.name in ['Super', 'Epic', 'Legendary']:
+            return 1/500 * 240
+        return 0
 
 
 
