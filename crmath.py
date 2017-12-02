@@ -74,7 +74,16 @@ class Chest:
         return 0
 
     def card_count_by_arena(self, arena_id):
-        return self.prop_by_arena('random_spells', arena_id)
+        if self.name == 'Legendary':
+            return 1
+        if self.name == 'Epic':
+            if arena_id < 9:
+                return int(chest_data['Epic_Arena{}'.format(arena_id)]['RandomSpells'])
+            return 20
+        row = arena_row_by_id(arena_id)
+        if row is not None:
+            return int(row['ChestRewardMultiplier']) / 100 * getattr(self, "random_spells")
+        return 0
 
     def min_gold_by_arena(self, arena_id):
         return self.min_gold_per_card * self.card_count_by_arena(arena_id)
