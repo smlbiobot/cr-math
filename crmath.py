@@ -58,8 +58,10 @@ class Chest:
         ))
         for arena_id in range(1, 13):
             cards = self.prop_by_arena('random_spells', arena_id)
-            min_gold_per_card = self.prop_by_arena('base_min_gold_per_card', arena_id)
-            max_gold_per_card = self.prop_by_arena('base_max_gold_per_card', arena_id)
+            min_gold_per_card = self.base_min_gold_per_card
+            max_gold_per_card = self.base_max_gold_per_card
+            # min_gold_per_card = self.prop_by_arena('base_min_gold_per_card', arena_id)
+            # max_gold_per_card = self.prop_by_arena('base_max_gold_per_card', arena_id)
             min_gold = min_gold_per_card * cards
             max_gold = max_gold_per_card * cards
 
