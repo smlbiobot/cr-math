@@ -11,15 +11,40 @@ class Chest:
         self.time = time
         self.gems = gems
         self.cards = cards
-        self.rares = rares
-        self.epics = epics
-        self.legendaries = legendaries
+        self.rares = rares * cards
+        self.epics = epics * cards
+        self.legendaries = legendaries * cards
         self.min_gold = min_gold
         self.max_gold = max_gold
 
     @property
     def commons(self):
         return self.cards - self.rares - self.epics - self.legendaries
+
+    def __str__(self):
+        return (
+            "name:        {}\n"
+            "time:        {:>10,.2f} hrs\n"
+            "gems:        {:>10,.2f}\n"
+            "commons:     {:>10,.2f}\n"
+            "rares:       {:>10,.2f}\n"
+            "epics:       {:>10,.2f}\n"
+            "legendaries: {:>10,.2f}\n"
+            "min gold:    {:>10,.2f}\n"
+            "max gold:    {:>10,.2f}\n"
+            "{}".format(
+                self.name,
+                self.time,
+                self.gems,
+                self.commons,
+                self.rares,
+                self.epics,
+                self.legendaries,
+                self.min_gold,
+                self.max_gold,
+                "-" * 40
+            )
+        )
 
 
 chests = [
@@ -28,7 +53,7 @@ chests = [
         time=3,
         gems=18,
         cards=13,
-        rares=1 + 0.083333,
+        rares=0.083333,
         epics=0.026,
         legendaries=0.00085,
         min_gold=65,
@@ -39,7 +64,7 @@ chests = [
         time=8,
         gems=48,
         cards=41,
-        rares=4 + 0.1,
+        rares=0.1,
         epics=0.14386,
         legendaries=0.00468,
         min_gold=205,
@@ -50,8 +75,8 @@ chests = [
         time=12,
         gems=72,
         cards=123,
-        rares=24 + 0.6,
-        epics=4 + 0.1,
+        rares=0.6,
+        epics=0.1,
         legendaries=0.13325,
         min_gold=1200,
         max_gold=1200
@@ -61,13 +86,16 @@ chests = [
         time=12,
         gems=72,
         cards=287,
-        rares=57 + 0.4,
+        rares=0.4,
         epics=0.574,
         legendaries=0.01866,
         min_gold=860,
         max_gold=860
     )
 ]
+for chest in chests:
+    print(chest)
+
 chest_cycle = client.get_constants().chest_cycle.order
 total_time = 0
 total_gems = 0
@@ -89,6 +117,8 @@ for cycle in chest_cycle:
             total_min_gold += chest.min_gold
             total_max_gold += chest.max_gold
 
+card_gold = total_commons * 5 + total_rares * 50 + total_epics * 500 + total_legendaries * 20000
+
 print(chest_cycle)
 print(
     "time:        {:>10,.2f} hrs\n"
@@ -97,6 +127,7 @@ print(
     "rares:       {:>10,.2f}\n"
     "epics:       {:>10,.2f}\n"
     "legendaries: {:>10,.2f}\n"
+    "card gold    {:>10,.2f}\n"
     "min gold:    {:>10,.2f}\n"
     "max gold:    {:>10,.2f}".format(
         total_time,
@@ -105,6 +136,7 @@ print(
         total_rares,
         total_epics,
         total_legendaries,
+        card_gold,
         total_min_gold,
         total_max_gold
     )
