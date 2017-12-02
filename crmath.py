@@ -53,19 +53,26 @@ class Chest:
                  'random_spells']
         for attr in attrs:
             out.append("{:<30}{:>10}".format(attr, getattr(self, attr)))
-        out.append("{:<10}{:>10}{:>10}{:>10}".format(
-            "Arena", "Card Count", "Min Gold", "Max Gold"
+        out.append(("{:>20}" * 6).format(
+            "Arena", "Card Count", "Min Gold Per Card", "Max Gold Per Card", "Min Gold", "Max Gold"
         ))
-        for arena_id in range(1, 12):
-            out.append("Arena {:<4}{:>10,.2f}{:>10,.2f}{:>10,.2f}".format(
+        for arena_id in range(1, 13):
+            cards = self.prop_by_arena('random_spells', arena_id)
+            min_gold_per_card = self.prop_by_arena('base_min_gold_per_card', arena_id)
+            max_gold_per_card = self.prop_by_arena('base_max_gold_per_card', arena_id)
+            min_gold = min_gold_per_card * cards
+            max_gold = max_gold_per_card * cards
+
+            out.append(("{:>20,.2f}" * 6).format(
                 arena_id,
-                self.prop_by_arena('random_spells', arena_id),
-                self.prop_by_arena('base_min_gold_per_card', arena_id),
-                self.prop_by_arena('base_max_gold_per_card', arena_id),
+                cards,
+                min_gold_per_card,
+                max_gold_per_card,
+                min_gold,
+                max_gold
             ))
-        # for tup in self.card_count:
-        #     out.append("Arena {:<3} {:>10,.2f}".format(tup[0], tup[1]))
-        out.append("-" * 40)
+
+        out.append("-" * 80)
         return "\n".join(out)
 
     @property
@@ -99,11 +106,15 @@ class Chest:
         return out
 
 
+out = []
 chests = []
 for name in ['Silver', 'Gold', 'Giant', 'Magic', 'Epic', 'Super', 'Legendary']:
     chest_data_dict = chest_data[name]
     chest_obj = Chest(name, chest_data_dict)
-    print(chest_obj)
+    out.append(chest_obj.__str__())
     chests.append(chest_obj)
 
-chest_cycle = client.get_constants().chest_cycle.order
+print('\n'.join(out))
+
+with open('out.txt', 'w') as f:
+    f.write('\n'.join(out))
