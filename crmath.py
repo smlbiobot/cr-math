@@ -60,15 +60,19 @@ class Chest:
                  'random_spells']
         for attr in attrs:
             out.append("{:<30}{:>10}".format(attr, getattr(self, attr)))
-        out.append(("{:>10}" * 4).format(
-            "Arena", "Cards", "Min Gold", "Max Gold"
+        out.append(("{:>10}" * 8).format(
+            "Arena", "Cards", "Min Gold", "Max Gold", "Commons", "Rares", "Epics", "Leggies"
         ))
         for arena_id in range(1, 13):
-            out.append(("{:>10,.2f}" * 4).format(
+            out.append(("{:>10,.2f}" * 8).format(
                 arena_id,
                 self.card_count_by_arena(arena_id),
                 self.min_gold_by_arena(arena_id),
-                self.max_gold_by_arena(arena_id)
+                self.max_gold_by_arena(arena_id),
+                self.common_count_by_arena(arena_id),
+                self.rare_count_by_arena(arena_id),
+                self.epic_count_by_arena(arena_id),
+                self.legendary_count_by_arena(arena_id)
             ))
 
         out.append("-" * 80)
@@ -91,6 +95,31 @@ class Chest:
         if row is not None:
             return int(row['ChestRewardMultiplier']) / 100 * getattr(self, "random_spells")
         return 0
+
+    def rare_count_by_arena(self, arena_id):
+        chance = self.rare_chance
+        if chance == 0:
+            return 0
+        return 1 / chance * self.card_count_by_arena(arena_id)
+
+    def epic_count_by_arena(self, arena_id):
+        chance = self.epic_chance
+        if chance == 0:
+            return 0
+        return 1 / chance * self.card_count_by_arena(arena_id)
+
+    def legendary_count_by_arena(self, arena_id):
+        chance = self.legendary_chance
+        if chance == 0:
+            return 0
+        return 1 / chance * self.card_count_by_arena(arena_id)
+
+    def common_count_by_arena(self, arena_id):
+        return (
+            self.card_count_by_arena(arena_id) -
+            self.rare_count_by_arena(arena_id) -
+            self.epic_count_by_arena(arena_id) -
+            self.legendary_count_by_arena(arena_id))
 
     def min_gold_by_arena(self, arena_id):
         return self.min_gold_per_card * self.card_count_by_arena(arena_id)
