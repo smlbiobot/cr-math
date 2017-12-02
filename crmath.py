@@ -42,8 +42,8 @@ class Chest:
         self.rare_chance = get_prop(data, 'RareChance')
         self.epic_chance = get_prop(data, 'EpicChance')
         self.legendary_chance = get_prop(data, 'LegendaryChance')
-        self.base_min_gold_per_card = get_prop(data, 'MinGoldPerCard')
-        self.base_max_gold_per_card = get_prop(data, 'MaxGoldPerCard')
+        self.min_gold_per_card = get_prop(data, 'MinGoldPerCard')
+        self.max_gold_per_card = get_prop(data, 'MaxGoldPerCard')
         self.random_spells = get_prop(data, 'RandomSpells')
 
     def __str__(self):
@@ -53,23 +53,17 @@ class Chest:
                  'random_spells']
         for attr in attrs:
             out.append("{:<30}{:>10}".format(attr, getattr(self, attr)))
-        out.append(("{:>20}" * 6).format(
-            "Arena", "Card Count", "Min Gold Per Card", "Max Gold Per Card", "Min Gold", "Max Gold"
+        out.append(("{:>20}" * 4).format(
+            "Arena", "Card Count", "Min Gold", "Max Gold"
         ))
         for arena_id in range(1, 13):
             cards = self.prop_by_arena('random_spells', arena_id)
-            min_gold_per_card = self.base_min_gold_per_card
-            max_gold_per_card = self.base_max_gold_per_card
-            # min_gold_per_card = self.prop_by_arena('base_min_gold_per_card', arena_id)
-            # max_gold_per_card = self.prop_by_arena('base_max_gold_per_card', arena_id)
-            min_gold = min_gold_per_card * cards
-            max_gold = max_gold_per_card * cards
+            min_gold = self.min_gold_per_card * cards
+            max_gold = self.max_gold_per_card * cards
 
-            out.append(("{:>20,.2f}" * 6).format(
+            out.append(("{:>20,.2f}" * 4).format(
                 arena_id,
                 cards,
-                min_gold_per_card,
-                max_gold_per_card,
                 min_gold,
                 max_gold
             ))
@@ -77,35 +71,11 @@ class Chest:
         out.append("-" * 80)
         return "\n".join(out)
 
-    @property
-    def card_count(self):
-        """Show stats based on arena."""
-        count = []
-        for arena_id in range(1, 12):
-            row = arena_row_by_id(arena_id)
-            if row is not None:
-                count.append((arena_id, self.random_spells * int(row['ChestRewardMultiplier']) / 100))
-        return count
-
     def prop_by_arena(self, prop, arena_id):
         row = arena_row_by_id(arena_id)
         if row is not None:
             return int(row['ChestRewardMultiplier']) / 100 * getattr(self, prop)
         return 0
-
-    @property
-    def min_gold_per_card(self):
-        out = []
-        for arena_id in range(1, 12):
-            out.append((arena_id, self.prop_by_arena('base_min_gold_per_card', arena_id)))
-        return out
-
-    @property
-    def max_gold_per_card(self):
-        out = []
-        for arena_id in range(1, 12):
-            out.append((arena_id, self.prop_by_arena('base_max_gold_per_card', arena_id)))
-        return out
 
 
 out = []
