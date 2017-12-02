@@ -2,6 +2,7 @@ import csv
 import pprint
 
 import crapipy
+import json
 
 client = crapipy.Client()
 
@@ -9,16 +10,21 @@ pp = pprint.PrettyPrinter(indent=2)
 
 # read data
 chest_data = {}
-with open('treasure_chests.csv') as f:
+with open('data/treasure_chests.csv') as f:
     reader = csv.DictReader(f)
     for row in reader:
         chest_data[row['Name']] = row
 
 arena_data = {}
-with open('arenas.csv') as f:
+with open('data/arenas.csv') as f:
     reader = csv.DictReader(f)
     for row in reader:
         arena_data[row['Name']] = row
+
+with open('data/chest_order.json') as f:
+    chest_order = json.load(f)['MainCycle']
+
+print(chest_order)
 
 def arena_row_by_id(arena_id):
     """Get arena data by arena int id."""
