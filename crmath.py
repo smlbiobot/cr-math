@@ -64,14 +64,14 @@ class Chest:
                  'random_spells']
         for attr in attrs:
             out.append("{:<30}{:>10}".format(attr, getattr(self, attr)))
-        out.append(("{:>12}" * 11).format(
+        out.append(("{:>14}" * 11).format(
             "Arena", "Cards", "Min Gold", "Max Gold", "Avg Gold", "Commons", "Rares", "Epics", "Leggies", "Card Worth", "Value"
         ))
         for arena_id in range(1, 13):
             avg_gold = (self.min_gold_by_arena(arena_id) + self.max_gold_by_arena(arena_id)) / 2
             card_worth = self.card_worth(arena_id)
             chest_value = avg_gold + card_worth
-            out.append(("{:>12,.2f}" * 11).format(
+            out.append(("{:>14,.5f}" * 11).format(
                 arena_id,
                 self.card_count_by_arena(arena_id),
                 self.min_gold_by_arena(arena_id),
