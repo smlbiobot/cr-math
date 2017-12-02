@@ -204,7 +204,7 @@ out.append("Total hrs in cycle")
 
 
 
-for arena_id in range(2, 12):
+for arena_id in range(1, 13):
     o = {
         "arena": arena_id,
         "total_hours": 0,
