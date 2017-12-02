@@ -3,6 +3,7 @@ import pprint
 
 import crapipy
 import json
+from collections import Counter
 
 client = crapipy.Client()
 
@@ -106,6 +107,10 @@ for name in ['Free','Silver', 'Gold', 'Star', 'Magic', 'Giant', 'Epic', 'Super',
     chest_obj = Chest(name, chest_data_dict)
     out.append(chest_obj.__str__())
     chests.append(chest_obj)
+
+chest_counter = Counter(chest_order).most_common()
+for k, count in chest_counter:
+    out.append('{:<10}{:>5}'.format(k, count))
 
 print('\n'.join(out))
 
