@@ -53,15 +53,15 @@ class Chest:
                  'random_spells']
         for attr in attrs:
             out.append("{:<30}{:>10}".format(attr, getattr(self, attr)))
-        out.append(("{:>20}" * 4).format(
-            "Arena", "Card Count", "Min Gold", "Max Gold"
+        out.append(("{:>10}" * 4).format(
+            "Arena", "Cards", "Min Gold", "Max Gold"
         ))
         for arena_id in range(1, 13):
             cards = self.prop_by_arena('random_spells', arena_id)
             min_gold = self.min_gold_per_card * cards
             max_gold = self.max_gold_per_card * cards
 
-            out.append(("{:>20,.2f}" * 4).format(
+            out.append(("{:>10,.2f}" * 4).format(
                 arena_id,
                 cards,
                 min_gold,
