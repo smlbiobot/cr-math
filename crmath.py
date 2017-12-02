@@ -193,12 +193,40 @@ out.append('-' * 80)
 
 
 
-chests = []
+chests = {}
 for name in ['Free','Silver', 'Gold', 'Star', 'Magic', 'Giant', 'Epic', 'Super', 'Legendary']:
     chest_data_dict = chest_data[name]
     chest_obj = Chest(name, chest_data_dict)
     out.append(chest_obj.__str__())
-    chests.append(chest_obj)
+    chests[name] = chest_obj
+    
+out.append("Total hrs in cycle")
+
+
+
+for arena_id in range(2, 12):
+    o = {
+        "arena": arena_id,
+        "total_hours": 0,
+        "total_value": 0,
+        "total_gems": 0
+    }
+
+    for name in ['Silver', 'Gold', 'Magic', 'Giant', 'Epic', 'Super', 'Legendary']:
+        chest = chests[name]
+        o["total_value"] += chest.value_in_cycle(arena_id)
+        o["total_gems"] += chest.gem_in_cycle
+        o["total_hours"] += chest.time_in_cycle
+
+    o["value_per_gem"] = o["total_value"] / o["total_gems"]
+    out.append("-" * 80)
+    out.append(
+        "Arena {arena}\n"
+        "Total Hours: {total_hours}\n"
+        "Total Gems:  {total_gems}\n"
+        "Total Value: {total_value}\n"
+        "Value per gem {value_per_gem}".format(**o)
+    )
 
 
 
