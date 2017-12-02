@@ -80,7 +80,7 @@ class Chest:
 
 out = []
 chests = []
-for name in ['Silver', 'Gold', 'Giant', 'Magic', 'Epic', 'Super', 'Legendary']:
+for name in ['Free','Silver', 'Gold', 'Star', 'Magic', 'Giant', 'Epic', 'Super', 'Legendary']:
     chest_data_dict = chest_data[name]
     chest_obj = Chest(name, chest_data_dict)
     out.append(chest_obj.__str__())
