@@ -1,150 +1,109 @@
+import csv
+import pprint
+
 import crapipy
 
 client = crapipy.Client()
 
+pp = pprint.PrettyPrinter(indent=2)
+
+# read data
+chest_data = {}
+with open('treasure_chests.csv') as f:
+    reader = csv.DictReader(f)
+    for row in reader:
+        chest_data[row['Name']] = row
+
+arena_data = {}
+with open('arenas.csv') as f:
+    reader = csv.DictReader(f)
+    for row in reader:
+        arena_data[row['Name']] = row
+
+def arena_row_by_id(arena_id):
+    """Get arena data by arena int id."""
+    for k, v in arena_data.items():
+        if v['Arena'] == str(arena_id):
+            return v
+    return None
+
+def get_prop(data, attr):
+    value = data.get(attr)
+    if value.isdigit():
+        value = int(value)
+    return value
+
 
 class Chest:
-    def __init__(self,
-                 name=None, time=None, gems=None, cards=None, rares=None, epics=None, legendaries=None,
-                 min_gold=0, max_gold=0):
+    def __init__(self, name, data):
         self.name = name
-        self.time = time
-        self.gems = gems
-        self.cards = cards
-        self.rares = rares * cards
-        self.epics = epics * cards
-        self.legendaries = legendaries * cards
-        self.min_gold = min_gold
-        self.max_gold = max_gold
-
-    @property
-    def commons(self):
-        return self.cards - self.rares - self.epics - self.legendaries
+        self.time_taken_hours = get_prop(data, 'TimeTakenHours')
+        self.chest_count_in_chest_cycle = get_prop(data, 'ChestCountInChestCycle')
+        self.rare_chance = get_prop(data, 'RareChance')
+        self.epic_chance = get_prop(data, 'EpicChance')
+        self.legendary_chance = get_prop(data, 'LegendaryChance')
+        self.base_min_gold_per_card = get_prop(data, 'MinGoldPerCard')
+        self.base_max_gold_per_card = get_prop(data, 'MaxGoldPerCard')
+        self.random_spells = get_prop(data, 'RandomSpells')
 
     def __str__(self):
-        return (
-            "name:        {}\n"
-            "time:        {:>10,.2f} hrs\n"
-            "gems:        {:>10,.2f}\n"
-            "commons:     {:>10,.2f}\n"
-            "rares:       {:>10,.2f}\n"
-            "epics:       {:>10,.2f}\n"
-            "legendaries: {:>10,.2f}\n"
-            "min gold:    {:>10,.2f}\n"
-            "max gold:    {:>10,.2f}\n"
-            "{}".format(
-                self.name,
-                self.time,
-                self.gems,
-                self.commons,
-                self.rares,
-                self.epics,
-                self.legendaries,
-                self.min_gold,
-                self.max_gold,
-                "-" * 40
-            )
-        )
+        out = []
+        attrs = ['name', 'time_taken_hours', 'chest_count_in_chest_cycle',
+                 'rare_chance', 'epic_chance', 'legendary_chance',
+                 'random_spells']
+        for attr in attrs:
+            out.append("{:<30}{:>10}".format(attr, getattr(self, attr)))
+        out.append("{:<10}{:>10}{:>10}{:>10}".format(
+            "Arena", "Card Count", "Min Gold", "Max Gold"
+        ))
+        for arena_id in range(1, 12):
+            out.append("Arena {:<4}{:>10,.2f}{:>10,.2f}{:>10,.2f}".format(
+                arena_id,
+                self.prop_by_arena('random_spells', arena_id),
+                self.prop_by_arena('base_min_gold_per_card', arena_id),
+                self.prop_by_arena('base_max_gold_per_card', arena_id),
+            ))
+        # for tup in self.card_count:
+        #     out.append("Arena {:<3} {:>10,.2f}".format(tup[0], tup[1]))
+        out.append("-" * 40)
+        return "\n".join(out)
+
+    @property
+    def card_count(self):
+        """Show stats based on arena."""
+        count = []
+        for arena_id in range(1, 12):
+            row = arena_row_by_id(arena_id)
+            if row is not None:
+                count.append((arena_id, self.random_spells * int(row['ChestRewardMultiplier']) / 100))
+        return count
+
+    def prop_by_arena(self, prop, arena_id):
+        row = arena_row_by_id(arena_id)
+        if row is not None:
+            return int(row['ChestRewardMultiplier']) / 100 * getattr(self, prop)
+        return 0
+
+    @property
+    def min_gold_per_card(self):
+        out = []
+        for arena_id in range(1, 12):
+            out.append((arena_id, self.prop_by_arena('base_min_gold_per_card', arena_id)))
+        return out
+
+    @property
+    def max_gold_per_card(self):
+        out = []
+        for arena_id in range(1, 12):
+            out.append((arena_id, self.prop_by_arena('base_max_gold_per_card', arena_id)))
+        return out
 
 
-chests = [
-    Chest(
-        name='Silver',
-        time=3,
-        gems=18,
-        cards=13,
-        rares=0.083333,
-        epics=0.026,
-        legendaries=0.00085,
-        min_gold=65,
-        max_gold=91
-    ),
-    Chest(
-        name='Gold',
-        time=8,
-        gems=48,
-        cards=41,
-        rares=0.1,
-        epics=0.14386,
-        legendaries=0.00468,
-        min_gold=205,
-        max_gold=287
-    ),
-    Chest(
-        name='Magic',
-        time=12,
-        gems=72,
-        cards=123,
-        rares=0.6,
-        epics=0.1,
-        legendaries=0.13325,
-        min_gold=1200,
-        max_gold=1200
-    ),
-    Chest(
-        name='Giant',
-        time=12,
-        gems=72,
-        cards=287,
-        rares=0.4,
-        epics=0.574,
-        legendaries=0.01866,
-        min_gold=860,
-        max_gold=860
-    )
-]
-for chest in chests:
-    print(chest)
+chests = []
+for name in ['Silver', 'Gold', 'Giant', 'Magic', 'Epic', 'Super', 'Legendary']:
+    chest_data_dict = chest_data[name]
+    chest_obj = Chest(name, chest_data_dict)
+    print(chest_obj)
+    chests.append(chest_obj)
 
 chest_cycle = client.get_constants().chest_cycle.order
-total_time = 0
-total_gems = 0
-total_commons = 0
-total_epics = 0
-total_rares = 0
-total_legendaries = 0
-total_min_gold = 0
-total_max_gold = 0
-for cycle in chest_cycle:
-    for chest in chests:
-        if chest.name == cycle:
-            total_time += chest.time
-            total_gems += chest.gems
-            total_commons += chest.commons
-            total_rares += chest.rares
-            total_epics += chest.epics
-            total_legendaries += chest.legendaries
-            total_min_gold += chest.min_gold
-            total_max_gold += chest.max_gold
-
-card_gold = total_commons * 5 + total_rares * 50 + total_epics * 500 + total_legendaries * 20000
-
-print(chest_cycle)
-print(
-    "time:        {:>10,.2f} hrs\n"
-    "gems:        {:>10,.2f}\n"
-    "commons:     {:>10,.2f}\n"
-    "rares:       {:>10,.2f}\n"
-    "epics:       {:>10,.2f}\n"
-    "legendaries: {:>10,.2f}\n"
-    "card gold    {:>10,.2f}\n"
-    "min gold:    {:>10,.2f}\n"
-    "max gold:    {:>10,.2f}".format(
-        total_time,
-        total_gems,
-        total_commons,
-        total_rares,
-        total_epics,
-        total_legendaries,
-        card_gold,
-        total_min_gold,
-        total_max_gold
-    )
-)
-print(
-    "min gold per gem: {:>10,.2f}\n"
-    "max gold per gem: {:>10,.2f}\n".format(
-        total_min_gold / total_gems,
-        total_max_gold / total_gems
-    )
-)
