@@ -27,6 +27,8 @@ with open('data/chest_order.json') as f:
 
 print(chest_order)
 
+chest_counter = Counter(chest_order).most_common()
+
 def arena_row_by_id(arena_id):
     """Get arena data by arena int id."""
     for k, v in arena_data.items():
@@ -39,6 +41,8 @@ def get_prop(data, attr):
     if value.isdigit():
         value = int(value)
     return value
+
+
 
 
 class Chest:
@@ -55,7 +59,7 @@ class Chest:
 
     def __str__(self):
         out = []
-        attrs = ['name', 'time_taken_hours', 'chest_count_in_chest_cycle',
+        attrs = ['name', 'time_taken_hours', 'chest_count_in_chest_cycle', 'count_per_cycle',
                  'rare_chance', 'epic_chance', 'legendary_chance',
                  'random_spells']
         for attr in attrs:
@@ -142,9 +146,29 @@ class Chest:
     def max_gold_by_arena(self, arena_id):
         return self.max_gold_per_card * self.card_count_by_arena(arena_id)
 
+    @property
+    def count_per_cycle(self):
+        # regular chest
+        for k, count in chest_counter:
+            if k == self.name:
+                return count
+        # special chest
+        return 1/500 * 240
+
 
 
 out = []
+
+out.append('-' * 80)
+out.append('Chest Cycle')
+chest_counter = Counter(chest_order).most_common()
+for k, count in chest_counter:
+    out.append('{:<10}{:>5}'.format(k, count))
+out.append('-' * 80)
+
+
+
+
 chests = []
 for name in ['Free','Silver', 'Gold', 'Star', 'Magic', 'Giant', 'Epic', 'Super', 'Legendary']:
     chest_data_dict = chest_data[name]
@@ -152,9 +176,7 @@ for name in ['Free','Silver', 'Gold', 'Star', 'Magic', 'Giant', 'Epic', 'Super',
     out.append(chest_obj.__str__())
     chests.append(chest_obj)
 
-chest_counter = Counter(chest_order).most_common()
-for k, count in chest_counter:
-    out.append('{:<10}{:>5}'.format(k, count))
+
 
 print('\n'.join(out))
 

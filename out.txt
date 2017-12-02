@@ -1,6 +1,14 @@
+--------------------------------------------------------------------------------
+Chest Cycle
+Silver      180
+Gold         52
+Magic         4
+Giant         4
+--------------------------------------------------------------------------------
 name                                Free
 time_taken_hours                        
 chest_count_in_chest_cycle              
+count_per_cycle                     0.48
 rare_chance                           10
 epic_chance                          200
 legendary_chance                    4000
@@ -22,6 +30,7 @@ random_spells                          3
 name                              Silver
 time_taken_hours                       3
 chest_count_in_chest_cycle            60
+count_per_cycle                      180
 rare_chance                           12
 epic_chance                          500
 legendary_chance                   10000
@@ -43,6 +52,7 @@ random_spells                          3
 name                                Gold
 time_taken_hours                       8
 chest_count_in_chest_cycle            19
+count_per_cycle                       52
 rare_chance                           10
 epic_chance                          285
 legendary_chance                    5700
@@ -64,6 +74,7 @@ random_spells                         10
 name                                Star
 time_taken_hours                        
 chest_count_in_chest_cycle              
+count_per_cycle                     0.48
 rare_chance                           10
 epic_chance                          200
 legendary_chance                    4000
@@ -85,6 +96,7 @@ random_spells                         20
 name                               Magic
 time_taken_hours                      12
 chest_count_in_chest_cycle             1
+count_per_cycle                        4
 rare_chance                            5
 epic_chance                           30
 legendary_chance                     600
@@ -106,6 +118,7 @@ random_spells                         30
 name                               Giant
 time_taken_hours                      12
 chest_count_in_chest_cycle             1
+count_per_cycle                        4
 rare_chance                            5
 epic_chance                          500
 legendary_chance                   10000
@@ -127,6 +140,7 @@ random_spells                         70
 name                                Epic
 time_taken_hours                      12
 chest_count_in_chest_cycle              
+count_per_cycle                     0.48
 rare_chance                            0
 epic_chance                            1
 legendary_chance                       0
@@ -148,6 +162,7 @@ random_spells                         20
 name                               Super
 time_taken_hours                      24
 chest_count_in_chest_cycle             1
+count_per_cycle                     0.48
 rare_chance                            5
 epic_chance                           30
 legendary_chance                     600
@@ -169,6 +184,7 @@ random_spells                        180
 name                           Legendary
 time_taken_hours                      24
 chest_count_in_chest_cycle             1
+count_per_cycle                     0.48
 rare_chance                            0
 epic_chance                            0
 legendary_chance                       1
@@ -187,7 +203,3 @@ random_spells                          1
        11.00        1.00        0.00        0.00        0.00        0.00        0.00        0.00        1.00   20,000.00   20,000.00
        12.00        1.00        0.00        0.00        0.00        0.00        0.00        0.00        1.00   20,000.00   20,000.00
 --------------------------------------------------------------------------------
-Silver      180
-Gold         52
-Magic         4
-Giant         4
