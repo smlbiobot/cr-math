@@ -60,19 +60,25 @@ class Chest:
                  'random_spells']
         for attr in attrs:
             out.append("{:<30}{:>10}".format(attr, getattr(self, attr)))
-        out.append(("{:>10}" * 8).format(
-            "Arena", "Cards", "Min Gold", "Max Gold", "Commons", "Rares", "Epics", "Leggies"
+        out.append(("{:>12}" * 11).format(
+            "Arena", "Cards", "Min Gold", "Max Gold", "Avg Gold", "Commons", "Rares", "Epics", "Leggies", "Card Worth", "Value"
         ))
         for arena_id in range(1, 13):
-            out.append(("{:>10,.2f}" * 8).format(
+            avg_gold = (self.min_gold_by_arena(arena_id) + self.max_gold_by_arena(arena_id)) / 2
+            card_worth = self.card_worth(arena_id)
+            chest_value = avg_gold + card_worth
+            out.append(("{:>12,.2f}" * 11).format(
                 arena_id,
                 self.card_count_by_arena(arena_id),
                 self.min_gold_by_arena(arena_id),
                 self.max_gold_by_arena(arena_id),
+                avg_gold,
                 self.common_count_by_arena(arena_id),
                 self.rare_count_by_arena(arena_id),
                 self.epic_count_by_arena(arena_id),
-                self.legendary_count_by_arena(arena_id)
+                self.legendary_count_by_arena(arena_id),
+                card_worth,
+                chest_value
             ))
 
         out.append("-" * 80)
@@ -120,6 +126,15 @@ class Chest:
             self.rare_count_by_arena(arena_id) -
             self.epic_count_by_arena(arena_id) -
             self.legendary_count_by_arena(arena_id))
+
+    def card_worth(self, arena_id):
+        """Total card worth."""
+        return (
+            self.common_count_by_arena(arena_id) * 1 +
+            self.rare_count_by_arena(arena_id) * 5 +
+            self.epic_count_by_arena(arena_id) * 500 +
+            self.legendary_count_by_arena(arena_id) * 20000
+        )
 
     def min_gold_by_arena(self, arena_id):
         return self.min_gold_per_card * self.card_count_by_arena(arena_id)
